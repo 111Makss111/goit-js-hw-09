@@ -67,29 +67,28 @@ const images = [
   },
 ];
 
-const containerGallery = document.querySelector('.gallery');
-containerGallery.insertAdjacentHTML('beforeend', createMarkup(images));
+const gallery = document.querySelector('.gallery');
 
-function createMarkup(arr) {
-  return arr
-    .map(
-      ({ original, preview, description }) => `
-            <li class="gallery-item">
-	            <a class="gallery-link" href="${original}">
-		              <img 
-                    class="gallery-image" 
-                    src="${preview}" 
-                    alt="${description}" 
-                  />
-	            </a>
-            </li>
-        `
-    )
-    .join('');
+function imgToHtml(images) {
+  let htmlList = '';
+
+  for (let index = 0; index < images.length; index++) {
+    const { preview, original, description } = images[index];
+    htmlList += `<li class="gallery-item">
+        <a class="gallery-link" href="${original}">
+          <img
+            class="gallery-image"
+            src="${preview}"
+            alt="${description}"
+          />
+        </a>
+      </li>`;
+  }
+  gallery.innerHTML = htmlList;
 }
+imgToHtml(images);
 
 let lightbox = new SimpleLightbox('.gallery a', {
-  sourceAttr: 'href',
   captionsData: 'alt',
   captionPosition: 'bottom',
   captionDelay: 250,

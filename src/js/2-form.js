@@ -1,57 +1,42 @@
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
+const form = document.querySelector('.feedback-form');
+const localStorageKey = 'feedback-form-state';
 
-const LS_KEY = 'feedback-form-state';
-const feedbackForm = document.querySelector('.feedback-form');
-const inputForm = document.querySelector('input[type="email"]');
-const textareaForm = document.querySelector('textarea');
+function saveFormData(formData) {
+  localStorage.setItem(localStorageKey, JSON.stringify(formData));
+}
 
-feedbackForm.addEventListener('input', event => {
-  if (event.target === inputForm || event.target === textareaForm) {
-    const email = inputForm.value.trim();
-    const message = textareaForm.value.trim();
+function fillUpForm() {
+  const savedData = localStorage.getItem(localStorageKey);
 
-    if (email !== '' || message !== '') {
-      const objInfo = { email, message };
-      localStorage.setItem(LS_KEY, JSON.stringify(objInfo));
-    }
-  }
-});
-
-const storageFormGetData = localStorage.getItem(LS_KEY);
-if (storageFormGetData) {
-  const { email, message } = JSON.parse(storageFormGetData);
-
-  if (email !== '' || message !== '') {
-    inputForm.value = email;
-    textareaForm.value = message;
+  if (savedData) {
+    const savedFormData = JSON.parse(savedData);
+    form.elements.email.value = savedFormData.email;
+    form.elements.message.value = savedFormData.message;
   }
 }
 
-feedbackForm.addEventListener('submit', clearForm);
-function clearForm(event) {
+fillUpForm();
+
+form.addEventListener('input', () => {
+  const formData = {
+    email: form.elements.email.value,
+    message: form.elements.message.value.trim(),
+  };
+  saveFormData(formData);
+});
+
+form.addEventListener('submit', event => {
   event.preventDefault();
+  const formData = {
+    email: form.elements.email.value,
+    message: form.elements.message.value.trim(),
+  };
 
-  const element = event.target.elements;
-  const email = element.email.value.trim();
-  const message = element.message.value.trim();
-  const objInfo = { email, message };
-
-  if (email && message) {
-    console.log({ email, message });
+  if (formData.email === '' || formData.message === '') {
+    alert('Fill please all fields');
   } else {
-    iziToast.error({
-      title: 'Error',
-      message: "Заповніть будь ласка обов'язкове поле",
-      position: 'topRight',
-      transitionIn: 'bounceInUp',
-      messageColor: 'white',
-      timeout: 3000,
-    });
+    console.log('Form:', formData);
+    localStorage.removeItem(localStorageKey);
+    form.reset();
   }
-
-  event.currentTarget.reset();
-  localStorage.removeItem(LS_KEY);
-};
-
-
+});
